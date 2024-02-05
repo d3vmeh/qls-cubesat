@@ -5,6 +5,8 @@ Quarry Lane Team's repo for the BWSI CubeSat Challenge 2024
 
 ## Feb 29th to Jan 4th
 
+## Week Summary
+
   We received our CubeSat kit and built and wired it during our meetings during school. The assembly for the Flat Sat Challenge was pretty straightforward since we were given instructions on how to build the Flat Sat. On Friday after school, we set up the Raspberry Pi and were able to SSH into it. However, we were unable to SSH over WiFi (possibly due to the school blocking it) but it worked when using a mobile hotspot. We also ran code on the Raspberry Pi to take photos with the camera and get data from the IMU. As of now, we have yet to take our team photo and submit it for the Flat Sat Challenge. 
 
 ## Next Steps
