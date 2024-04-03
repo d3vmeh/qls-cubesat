@@ -108,13 +108,13 @@ def highlight_rects(rects,difference,before_img,after_img,before_ratios,after_ra
     return before_img, after_img
 
     
-before_path = "/Users/devm2/Documents/Cubesat/testing/beforealbany.png"
+before_path = "images/beforealbany.png"
 before_colored = cv2.imread(before_path)
 before_img = cv2.imread(before_path, cv2.IMREAD_GRAYSCALE)
 
 thresh = 50
 
-after_path = "/Users/devm2/Documents/Cubesat/testing/afteralbany.png"
+after_path = "images/afteralbany.png"
 after_colored = cv2.imread(after_path)
 after_img = cv2.imread(after_path,cv2.IMREAD_GRAYSCALE)
 after_bw = cv2.threshold(after_img, thresh, 255, cv2.THRESH_BINARY)[1]
