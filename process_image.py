@@ -37,7 +37,6 @@ def make_rects(img,rect_width,rect_height):
         x1 = x + rect_width
         while y<img_height:
             y1 = y + rect_height
-            #print(x,y,x1,y1)
             rect = [[x,y],[x1,y1]]
             rects.append(rect)
             y = y1
@@ -82,19 +81,33 @@ def get_amount_white(img,rects):
                     num_white += 1
                 else:
                     num_black += 1
-        ratios.append(num_white/num_black)
+
+        if num_black != 0:
+            ratios.append(num_white/num_black)
+        else:
+            ratios.append(0.99)
         
     return ratios
 
-def highlight_rects(rects,difference,before_img,after_img,before_ratios,after_ratios):
+
+def highlight_rects(rects,difference,before_img,after_img,before_ratios,after_ratios,show_text=False,text_scale = 0.9, text_thickness = 2):
     i = 0
     
     for rect in rects:
         before_ratio = before_ratios[i]
         after_ratio = after_ratios[i]
 
-        i += 1
 
+        if show_text == True:
+            x = rect[0][0]
+            y = rect[0][1]
+            height = rect[1][1] - rect[0][1]
+            centery = int(y + height/2)
+            before_img = cv2.putText(before_img, str(round(before_ratios[i]*100,1)), (x, centery), cv2.FONT_HERSHEY_SIMPLEX, text_scale, (36,255,12), text_thickness)
+            after_img = cv2.putText(after_img, str(round(after_ratios[i]*100,1)), (x, centery), cv2.FONT_HERSHEY_SIMPLEX, text_scale, (36,255,12), text_thickness)
+        
+        
+        
         if before_ratio-difference<after_ratio:
             before_img = cv2.rectangle(before_img, rect[0], rect[1], (255,0,0), 1)
             after_img = cv2.rectangle(after_img, rect[0], rect[1], (255,0,0), 1)
@@ -103,18 +116,19 @@ def highlight_rects(rects,difference,before_img,after_img,before_ratios,after_ra
             before_img = cv2.rectangle(before_img, rect[0], rect[1], (0,0,255), 4)
             after_img = cv2.rectangle(after_img, rect[0], rect[1], (0,0,255), 4)
 
-       
+        i += 1
 
     return before_img, after_img
 
-    
-before_path = "/Users/devm2/Documents/Cubesat/testing/beforealbany.png"
+
+
+#Converting images to black-and-white
+thresh = 120
+before_path = "images/houstonbefore.png"
 before_colored = cv2.imread(before_path)
 before_img = cv2.imread(before_path, cv2.IMREAD_GRAYSCALE)
 
-thresh = 50
-
-after_path = "/Users/devm2/Documents/Cubesat/testing/afteralbany.png"
+after_path = "images/houstonafter.png"
 after_colored = cv2.imread(after_path)
 after_img = cv2.imread(after_path,cv2.IMREAD_GRAYSCALE)
 after_bw = cv2.threshold(after_img, thresh, 255, cv2.THRESH_BINARY)[1]
@@ -126,54 +140,27 @@ before_colored = cv2.resize(before_colored,after_img.shape[::-1])
 before_bw = cv2.threshold(before_img, thresh, 255, cv2.THRESH_BINARY)[1]
 
 
-
-
-
-rects = make_rects(before_bw,100,100)
-
+#Dividing images into rectangles
+rects = make_rects(before_bw,50,50)
 before_drawn = draw_rects(before_bw,rects)
 after_drawn = draw_rects(after_bw,rects)
 
 
-
-#cv2.imshow("image",before_bw)
-
-
-
-
-
+#Get pixel ratios
 before_ratios = get_amount_white(before_drawn,rects)
 after_ratios = get_amount_white(after_drawn,rects)
 
-
-final_before, final_after = highlight_rects(rects,0.004,before_colored,after_colored,before_ratios,after_ratios)
-
-before_bw2 = cv2.threshold(before_img, thresh, 255, cv2.THRESH_BINARY)[1]
-after_bw2 = after_bw
-before_bw2, after_bw2 = highlight_rects(rects,0.3,before_bw2,after_bw2,before_ratios,after_ratios)
+ratio_difference = 0.75
+final_before, final_after = highlight_rects(rects,ratio_difference,before_colored,after_colored,before_ratios,after_ratios,show_text = True, text_scale = 0.6, text_thickness= 1)
 
 
+#Showing before and after images side-by-side
+comparison_bw = np.concatenate((before_bw, after_bw), axis=1) 
 
+comparison_color = np.concatenate((final_before,final_after),axis = 1)
 
-Hori = np.concatenate((show_ratios(final_before,rects,before_ratios), show_ratios(final_after,rects,after_ratios)), axis=1) 
-#Hori = np.concatenate((before_bw, after_bw), axis=1) 
-# concatenate image Vertically 
-#Verti = np.concatenate((before_bw2, after_bw2), axis=0) 
-
-
-
-# cv2.imshow("image",i)
-
-
-cv2.imshow('HORIZONTAL', Hori) 
-#cv2.imshow('VERTICAL', Verti)
-
-
-
-
-
+cv2.imshow('Black-and-white: Before (left) VS After (right)', comparison_bw) 
+cv2.imshow("Before (left) VS After (right)",comparison_color)
 
 cv2.waitKey(0) 
-  
-# # closing all open windows 
 cv2.destroyAllWindows() 
