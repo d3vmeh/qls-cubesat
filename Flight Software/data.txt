@@ -1,0 +1,6 @@
+Altitude: 400
+Battery charge: 0.75
+Battery Temperature: 12.13
+Roll: 32.5
+Pitch: 146.12
+Yaw: 3.6
